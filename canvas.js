@@ -4,8 +4,8 @@ const purityMarker = document.getElementById('purity-concentration-marker');
 const charcoalMarker = document.getElementById('charcoal-concentration-marker');
 const canvas  = document.querySelector('canvas');
 const c = canvas.getContext('2d');
-// document.querySelector('body').append(img)
 
+// check for devices smaller than 700px
 if(innerWidth < 700){
     canvas.width = innerWidth-20;
     canvas.height = innerHeight*0.7;
@@ -14,7 +14,7 @@ if(innerWidth < 700){
     canvas.height = innerHeight*0.9;
 }
 
-canvas.onselectstart = function () { return false; }
+//Gradient generator for canvas background
 function gradientGenerator(){
     let my_gradient = c.createLinearGradient(0, 0, 0, 1200);
     my_gradient.addColorStop(0, "#0082c8");
@@ -30,19 +30,24 @@ let colors = [
     '#071a52'
 ]
 
+//initialize mouse object with undefined coordinates
 let mouse = {
     x: undefined,
     y: undefined
 }
 
+//add event to start cleaning process
 cleanBtn.addEventListener('click',() =>{
     startCleaningProcess();
 })
 
+// add event to start charcoal removal
 removeCharcoalBtn.addEventListener('click',() =>{
     charcoalBallsArray = [];
 })
 
+
+// keep track of screen size changes and fire up init() function each time so as molecules could be regenerated
 addEventListener('resize',() =>{
     if(innerWidth < 600){
         canvas.width = innerWidth-20;
@@ -55,28 +60,35 @@ addEventListener('resize',() =>{
     init();
 })
 
+
+// mousedown event so as mouse object is updated with current mouse position and then becomes undefined on mouseup position
 canvas.addEventListener('mousedown',(e) =>{
     mouse.x = e.x;
     mouse.y = e.y;
 
+    //generate new impurity molecules on mouse down event anywhere on the canvas
     generateMolecules();
 })
 
+// mouseup event in affect
 canvas.addEventListener('mouseup',(e) =>{
     mouse.x = undefined;
     mouse.y = undefined;
 })
 
-
+//utility function to generate a random integer between any 2 provided integers.
 function randomIntFromRange(min,max) {
 	return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
+//utility function to generate a random color from the colors array
 function getRandomColors(){
   let k = Math.floor(Math.random()*colors.length);
   return colors[k];
 }
 
+
+// find the distance between 2 molecules or a molecule and the canvas walls
 function collisionDist(x1,y1,x2,y2){
     let xDist = x2-x1;
     let yDist = y2-y1;
@@ -84,7 +96,7 @@ function collisionDist(x1,y1,x2,y2){
     return Math.sqrt(Math.pow(xDist,2)+Math.pow(yDist,2));
 }
 
-
+// utility function helpfull in rotating the x-y plane once newtonion theorem is applied in 1-D
 function rotate(velocity, angle) {
     const rotatedVelocities = {
         x: velocity.x * Math.cos(angle) - velocity.y * Math.sin(angle),
@@ -94,7 +106,8 @@ function rotate(velocity, angle) {
     return rotatedVelocities;
 }
 
-
+// Apply newtonian theorem in 1-D so as elastic collision could be acheived. Energy throughout the system remains constant.
+// Energy of initial particles(pure water molecules) changes when impurity/charcoal is induced. 
 function resolveCollision(particle, otherParticle) {
     const xVelocityDiff = particle.velocity.x - otherParticle.velocity.x;
     const yVelocityDiff = particle.velocity.y - otherParticle.velocity.y;
@@ -133,7 +146,7 @@ function resolveCollision(particle, otherParticle) {
     }
 }
 
-
+// class responsible for drawing an updating water,impurity and charcoal molecules
 class Molecule{
     constructor(x,y,velocity,radius,color){
         this.x = x;
@@ -144,6 +157,7 @@ class Molecule{
         this.mass = 2;
     }
 
+    //The following function is responsible for drawing static water and impurity molecules
     draw(){
         c.beginPath()
         c.arc(this.x,this.y,this.radius,0,Math.PI * 2,false);
@@ -155,6 +169,7 @@ class Molecule{
         c.closePath();
     }
 
+    //The following function is responsible for drawing static charcoal balls only
     drawCharcoalBall(){
         c.beginPath()
         c.arc(this.x,this.y,this.radius,0,Math.PI * 2,false);
@@ -168,15 +183,20 @@ class Molecule{
         c.closePath();
     }
 
+    //The following function updates water molecules/impurity molecules and hence provides movement to them in random directions
     update(){
+
+        //check for collision with left-right canvas walls
         if(this.x+this.radius >= canvas.width || this.x-this.radius <= 0){
             this.velocity.x = -this.velocity.x;
         }
 
+        //check for collision with top-bottom canvas walls
         if(this.y+this.radius >= canvas.height || this.y-this.radius <= 0){
             this.velocity.y = -this.velocity.y;
         }        
 
+        // check for collision of water/impurity molecules with one another except themselves
         moleculeArray.forEach(molecule =>{
             if(this !== molecule){
                 let collisionDistVal = collisionDist(this.x,this.y,molecule.x,molecule.y);
@@ -186,21 +206,28 @@ class Molecule{
             }
         })        
 
-      
+        // increment velocity in x and y directions
         this.x += this.velocity.x;
         this.y += this.velocity.y;
+
+        // draw the molecules at newly generated coordinates
         this.draw();
     }
 
+    //The following function updates charcoal molecules and hence provides movement to them in random directions
     updateCharcoalBall(){
+
+        //check for collision with left-right canvas walls
         if(this.x+this.radius >= canvas.width || this.x-this.radius <= 0){
             this.velocity.x = -this.velocity.x;
         }
 
+        //check for collision with top-bottom canvas walls
         if(this.y+this.radius >= canvas.height || this.y-this.radius <= 0){
             this.velocity.y = -this.velocity.y;
         }        
 
+        // check for collision of charcoal molecules with one another except themselves
         charcoalBallsArray.forEach((ball,index) =>{
             if(this !== ball){
                 let collisionDistVal = collisionDist(this.x,this.y,ball.x,ball.y);
@@ -209,7 +236,10 @@ class Molecule{
                 }
             }
 
-
+            // check if index of molecule array is less than starting molecules than resolve the collision otherwise at all other indexes
+            // impurity particles are present and thus when charcoal comes in contact with them, remove them from array
+            // Charcoal molecules size increases on coming in contact with impurity molecules and after their radius becomes more than 20px
+            // remove them from the charcoal-array 
             moleculeArray.forEach((molecule,i) =>{
                 let collisionDistVal = collisionDist(this.x,this.y,molecule.x,molecule.y);
                 if(collisionDistVal - (this.radius+molecule.radius) < 0){
@@ -230,8 +260,11 @@ class Molecule{
 
         })        
       
+        // increment velocity of charcoal molecules in x and y directions
         this.x += this.velocity.x;
         this.y += this.velocity.y;
+
+        // draw the charcoal molecules at newly generated coordinates
         this.drawCharcoalBall();
     }
 }
@@ -245,8 +278,10 @@ let startingMolecules;
 let purityConcentrationValue = 0;
 let charcoalConcentrationValue = 0;
 
-
+// The following function is responsible for creating multiple new objects for Molecule class so as only water-molecules could be generated 
+// on the start
 function init(){
+    //re-initialize the molecule array to an empty array so that water molecules do not increase so much when window is resized
     moleculeArray = [];
     startingMolecules = 30;
     for(i = 0;i < startingMolecules; i++){
@@ -258,6 +293,7 @@ function init(){
             y: Math.random() 
         }
 
+        // check if water molecules are not generated together and hence prevent 2 molecules getting joined up
         if( i !== 0){
             for(let j=0; j < moleculeArray.length; j++){
                 if(collisionDist(x,y,moleculeArray[j].x,moleculeArray[j].y) - radius - moleculeArray[j].radius < 0){
@@ -273,6 +309,8 @@ function init(){
     }
 }
 
+
+// The generateMolecules() function generates objects for new impurity molecules when clicked on canvas anywhere
 function generateMolecules(){
     for(i = 0;i < randomIntFromRange(1,5); i++){
         let radius = randomIntFromRange(5,20);
@@ -288,6 +326,8 @@ function generateMolecules(){
     }
 }
 
+
+// Object for charcoal molecules are created when cleanBtn is clicked
 function startCleaningProcess(){
     for(i = 0;i < 5; i++){
         let radius = 10;
@@ -301,7 +341,7 @@ function startCleaningProcess(){
     }
 }
 
-
+// Animation loop keeps the functions running at all time
 function animate(){
     requestAnimationFrame(animate);
     gradientGenerator();
@@ -314,6 +354,7 @@ function animate(){
         ball.updateCharcoalBall();
     })
 
+    //insert concentration values in DOM. The more the value, higher is the concentration
     purityMarker.innerHTML = 'Impurity Concentration: ' + (moleculeArray.length - startingMolecules);
     charcoalMarker.innerHTML = 'Charcoal Concentration: ' + charcoalBallsArray.length;
 }
