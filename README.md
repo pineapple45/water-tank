@@ -8,3 +8,5 @@ using remove charcoal button.
 ![](https://github.com/pineapple45/water-tank/blob/master/preview.gif)
 
 Live Preview: https://pineapple45.github.io/water-tank/
+
+Reference to vedio on collision detection by Chris Courses: https://www.youtube.com/watch?v=789weryntzM&list=PLpPnRKq7eNW3We9VdCfx9fprhqXHwTPXL&index=7
