@@ -8,7 +8,7 @@ const c = canvas.getContext('2d');
 // check for devices smaller than 700px
 if(innerWidth < 700){
     canvas.width = innerWidth-20;
-    canvas.height = innerHeight*0.8;
+    canvas.height = innerHeight*0.75;
 }else{
     canvas.width = innerWidth-20;
     canvas.height = innerHeight*0.9;
@@ -51,7 +51,7 @@ removeCharcoalBtn.addEventListener('click',() =>{
 addEventListener('resize',() =>{
     if(innerWidth < 600){
         canvas.width = innerWidth-20;
-        canvas.height = innerHeight*0.8;
+        canvas.height = innerHeight*0.75;
     }else{
         canvas.width = innerWidth-20;
         canvas.height = innerHeight*0.9;
