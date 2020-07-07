@@ -1,6 +1,8 @@
 const cleanBtn = document.getElementById('clean-btn');
 const removeCharcoalBtn = document.getElementById('remove-charcoal-btn');
 const purityMarker = document.getElementById('purity-concentration-marker');
+const infoBtn = document.getElementById('info-btn');
+const info = document.querySelector('.info');
 const charcoalMarker = document.getElementById('charcoal-concentration-marker');
 const canvas  = document.querySelector('canvas');
 const c = canvas.getContext('2d');
@@ -24,10 +26,10 @@ function gradientGenerator(){
 }
 
 let colors = [
-    '#a7ff83',
-    '#ec1c24',
-    '#ff8400',
-    '#071a52'
+    '#fda403',
+    '#e8751a',
+    '#c51350',
+    '#8a1253'
 ]
 
 //initialize mouse object with undefined coordinates
@@ -46,6 +48,19 @@ removeCharcoalBtn.addEventListener('click',() =>{
     charcoalBallsArray = [];
 })
 
+
+//remove show-info class when click upon canvas
+canvas.addEventListener('click',() =>{
+    if(info.classList.contains('show-info')){
+        info.classList.remove('show-info');
+    }
+})
+
+
+//show info-box on click event
+infoBtn.addEventListener('click',() =>{
+    info.classList.toggle('show-info');
+})
 
 // keep track of screen size changes and fire up init() function each time so as molecules could be regenerated
 addEventListener('resize',() =>{

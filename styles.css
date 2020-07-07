@@ -3,6 +3,24 @@ body{
     font-family: 'Nunito', sans-serif;
 }
 
+.info{
+    border: 1px solid grey;
+    border-radius: 5px;
+    width: 350px;
+    padding: 10px;
+    text-align: justify;
+    background-color: pink;
+    position: absolute;
+    top: 30vh;
+    left: 38vw;
+    user-select: none;
+    display: none;
+}
+
+.show-info{
+    display: initial;
+}
+
 canvas{
     cursor: pointer;
     border: 2px solid #000e8e;
@@ -47,5 +65,9 @@ canvas{
         width: 50%;
         text-align: center;
         margin: 10px auto;
+    }
+    .info{
+        top: 20vh;
+        left: 12vw;
     }
   }
