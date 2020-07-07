@@ -6,13 +6,13 @@ body{
 .info{
     border: 1px solid grey;
     border-radius: 5px;
-    width: 350px;
+    width: 300px;
     padding: 10px;
     text-align: justify;
     background-color: pink;
     position: absolute;
     top: 30vh;
-    left: 38vw;
+    left: calc(50% - 160px);
     user-select: none;
     display: none;
 }
@@ -66,8 +66,9 @@ canvas{
         text-align: center;
         margin: 10px auto;
     }
-    .info{
+    /* .info{
         top: 20vh;
-        left: 12vw;
-    }
+        left: 5vw;
+        width: 300px;
+    } */
   }

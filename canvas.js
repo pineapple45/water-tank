@@ -18,7 +18,7 @@ if(innerWidth < 700){
 
 //Gradient generator for canvas background
 function gradientGenerator(){
-    let my_gradient = c.createLinearGradient(0, 0, 0, 1200);
+    let my_gradient = c.createLinearGradient(0, 0, 0, 1500);
     my_gradient.addColorStop(0, "#0082c8");
     my_gradient.addColorStop(1, "white");
     c.fillStyle = my_gradient;
