@@ -1,1 +1,1 @@
-![](preview.gif)
+![](https://github.com/pineapple45/water-tank/blob/master/preview.gif)
