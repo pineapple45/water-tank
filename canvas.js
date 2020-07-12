@@ -43,11 +43,6 @@ cleanBtn.addEventListener('click',() =>{
     startCleaningProcess();
 })
 
-// add event to start charcoal removal
-removeCharcoalBtn.addEventListener('click',() =>{
-    charcoalBallsArray = [];
-})
-
 
 //remove show-info class when click upon canvas
 canvas.addEventListener('click',() =>{
@@ -401,7 +396,7 @@ function startCleaningProcess(){
             x: Math.random() * randomIntFromRange(3,8) ,
             y: Math.random() * randomIntFromRange(3,8)
         }
-        charcoalBallsArray.push(new Molecule(genX,genY,velocity,radius,'black'));
+        charcoalBallsArray.push(new Molecule(genX,genY,velocity,radius,'#484848'));
     }
 }
 
