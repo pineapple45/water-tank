@@ -121,6 +121,44 @@ function rotate(velocity, angle) {
     return rotatedVelocities;
 }
 
+function resolveInelasticCollision(particle, otherParticle){
+    const xVelocityDiff = particle.velocity.x - otherParticle.velocity.x;
+    const yVelocityDiff = particle.velocity.y - otherParticle.velocity.y;
+
+    const xDist = otherParticle.x - particle.x;
+    const yDist = otherParticle.y - particle.y;
+
+    // Prevent accidental overlap of particles
+    if (xVelocityDiff * xDist + yVelocityDiff * yDist >= 0) {
+        // Grab angle between the two colliding particles
+        const angle = -Math.atan2(otherParticle.y - particle.y, otherParticle.x - particle.x);
+
+        // Store mass in var for better readability in collision equation
+        const m1 = particle.mass;
+        const m2 = otherParticle.mass;
+
+        // Velocity before equation
+        const u1 = rotate(particle.velocity, angle);
+        const u2 = rotate(otherParticle.velocity, angle);
+
+        // Velocity after 1d inelastic collision equation
+        const v1 = { x: (m1*u1.x + m2*u2.x )/ (m1+m2), y: u1.y };
+        const v2 = { x: (m1*u1.x + m2*u2.x )/ (m1+m2), y: u2.y };
+
+        // Final velocity after rotating axis back to original location
+        const vFinal1 = rotate(v1, -angle);
+        const vFinal2 = rotate(v2, -angle);
+
+        // Swap particle velocities for realistic bounce effect
+        particle.velocity.x = vFinal2.x;
+        particle.velocity.y = vFinal2.y;
+
+        otherParticle.velocity.x = vFinal1.x;
+        otherParticle.velocity.y = vFinal1.y;
+    }
+
+}
+
 // Apply newtonian theorem in 1-D so as elastic collision could be acheived. Energy throughout the system remains constant.
 // Energy of initial particles(pure water molecules) changes when impurity/charcoal is induced. 
 function resolveCollision(particle, otherParticle) {
@@ -262,18 +300,29 @@ class Molecule{
                         resolveCollision(this,molecule)
                     }
                     else{
-                        if(this.radius < 20){
-                            moleculeArray.splice(i,1);
-                            this.radius += 1;
+                        resolveInelasticCollision(this,molecule)
+                        if(molecule.radius > 0 ){
+                            molecule.radius -= 1;
                         }
                         else{
-                            charcoalBallsArray.splice(index,1);
+                        moleculeArray.splice(i,1);                                                                
                         }
                     }
                 }
             })
 
-        })        
+        })  
+        
+
+        // remove charcoalballs slowly after all impurity molecules are removed
+        if(moleculeArray.length == startingMolecules){
+            if(this.radius > 0.05){
+                this.radius -= 0.05;
+            }
+            else{
+                charcoalBallsArray = [];
+            }
+        }
       
         // increment velocity of charcoal molecules in x and y directions
         this.x += this.velocity.x;
